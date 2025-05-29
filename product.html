@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ShopEasy | Product Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class=" min-h-screen bg-gray-100 flex flex-col text-gray-800">
+    <nav class="bg-white shadow-md p-4 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-blue-600">ShopEasy</a>
+      <a href="cart.html" class="relative text-lg">
+        Cart 🛒
+        <span id="cart-count" class="absolute -top-2 -right-4 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+      </a>
+    </nav>
+
+    <main id="product-details-container" class="container mx-auto px-6 py-8"></main>
+
+    <footer class="bg-white text-center py-4 text-sm text-gray-500 mt-auto">
+        © 2025 ShopEasy by Krish
+      </footer>
+      
+      
+
+    <script src="scripts.js"></script>
+    <script>
+      async function render_product_details() {
+        const product_id = parseInt(get_param("id"));
+        const container = document.getElementById("product-details-container");
+
+        if (!product_id) {
+          container.innerHTML = "<p>Invalid Product ID</p>";
+          return;
+        }
+
+        const products = await get_products();
+        const product = products.find(p => p.id === product_id);
+
+        if (!product) {
+          container.innerHTML = "<p>Product not found</p>";
+          return;
+        }
+
+        container.innerHTML = `
+            <div class="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row gap-6">
+                <img src="${product.image}" alt="${product.name}" class="aspect-[3/4] h-[40rem] object-cover rounded" />
+                <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold">${product.brand} - ${product.name}</h2>
+                    <p class="text-gray-500 text-sm mb-2">${product.category}</p>
+                    <div class="flex items-center text-yellow-500">
+                    ${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5 - Math.floor(product.rating))}
+                    <span class="ml-2 text-gray-600 text-sm">(${product.reviews} reviews)</span>
+                    </div>
+                    <ul class="text-sm text-gray-700 mt-3 list-disc list-inside">
+                    ${product.features.map(f => `<li>${f}</li>`).join("")}
+                    </ul>
+                    <p class="mt-4">${product.description}</p>
+                </div>
+                <div class="mt-6">
+                    <p class="text-2xl font-bold mb-1">₹${product.price}</p>
+                    <p class="text-sm ${product.in_stock ? 'text-green-600' : 'text-red-500'}">
+                    ${product.in_stock ? 'In Stock' : 'Out of Stock'}
+                    </p>
+                    <div class="flex gap-2 mt-2">
+                    ${product.color_options.map(c => `<span class="w-5 h-5 rounded-full border" style="background:${c.toLowerCase()}"></span>`).join("")}
+                    </div>
+                    ${
+                    product.in_stock === true
+                        ? `<button class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 w-full" onclick="add_to_cart(${product.id})">
+                            Add to Cart
+                        </button>`
+                        : `<button disabled class="mt-4 bg-gray-400 text-white px-6 py-2 rounded w-full cursor-not-allowed">
+                            Out of Stock
+                        </button>`
+                    }
+                </div>
+                </div>
+            </div>
+            `;
+
+
+        update_cart_count();
+      }
+
+      render_product_details();
+    </script>
+  </body>
+</html>

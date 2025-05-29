@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShopEasy | Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col text-gray-900">
+
+<nav class="bg-white shadow-md p-4 flex justify-between items-center">
+  <a href="index.html" class="text-2xl font-bold text-blue-600">ShopEasy</a>
+  <a href="cart.html" class="text-lg bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Cart 🛒</a>
+</nav>
+
+<main class="container mx-auto flex-grow max-w-4xl p-6">
+  <h1 class="text-3xl font-semibold mb-8">Checkout</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <form id="checkout-form" onsubmit="event.preventDefault(); alert('Order placed! (not really)'); localStorage.removeItem('mini_ecom_cart'); window.location='index.html';" class="bg-white p-6 rounded-lg shadow-md space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium mb-1">Full Name</label>
+        <input type="text" id="name" name="name" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <input type="email" id="email" name="email" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label for="address" class="block text-sm font-medium mb-1">Shipping Address</label>
+        <textarea id="address" name="address" rows="3" required class="w-full border border-gray-300 rounded px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+
+      <div>
+        <label for="payment" class="block text-sm font-medium mb-1">Payment Method</label>
+        <select id="payment" name="payment" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Select</option>
+          <option value="card">Credit/Debit Card</option>
+          <option value="paypal">PayPal</option>
+          <option value="cod">Cash on Delivery</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition font-semibold">Place Order</button>
+    </form>
+
+    <section id="order-summary" class="bg-white p-6 rounded-lg shadow-md">
+      <!-- Order summary will be injected here -->
+    </section>
+  </div>
+</main>
+
+<footer class="bg-white text-center py-4 text-sm text-gray-500 mt-auto">
+  © 2025 ShopEasy by Krish
+</footer>
+
+<script src="scripts.js"></script>
+<script>
+  function format_price(price) {
+    return `₹${price.toFixed(2)}`;
+  }
+
+  async function render_order_summary() {
+    const cart = get_cart();
+    const products = await get_products();
+
+    if (Object.keys(cart).length === 0) {
+      document.getElementById('order-summary').innerHTML = `
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+        <p class="text-gray-600">Your cart is empty. <a href="index.html" class="text-blue-600 hover:underline">Shop now</a>.</p>
+      `;
+      return;
+    }
+
+    const summary = Object.entries(cart).map(([id, qty]) => {
+      const product = products.find(p => p.id === +id);
+      if (!product) return '';
+      return `
+        <li class="flex justify-between py-2 border-b border-gray-200">
+          <span>${product.name} x${qty}</span>
+          <span class="font-semibold">${format_price(product.price * qty)}</span>
+        </li>
+      `;
+    }).join('');
+
+    const total = Object.entries(cart).reduce((acc, [id, qty]) => {
+      const product = products.find(p => p.id === +id);
+      return product ? acc + product.price * qty : acc;
+    }, 0);
+
+    document.getElementById('order-summary').innerHTML = `
+      <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+      <ul class="divide-y divide-gray-200 mb-4">${summary}</ul>
+      <p class="text-lg font-bold text-right">Total: ${format_price(total)}</p>
+    `;
+  }
+  render_order_summary();
+</script>
+</body>
+</html>

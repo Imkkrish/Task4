@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ShopEasy | Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 flex flex-col text-gray-800">
+    <nav class="bg-white shadow-md p-4 flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold text-blue-600">ShopEasy</a>
+      <a href="cart.html" class="relative text-lg">
+        Cart 🛒
+        <span id="cart-count" class="absolute -top-2 -right-4 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+      </a>
+    </nav>
+
+    <main class="max-w-7xl flex-grow mx-auto px-4 py-8">
+      <h1 class="text-3xl font-semibold mb-6">Products</h1>
+      <div id="product-list" class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3"></div>
+    </main>
+
+    <footer class="bg-white text-center py-4 text-sm text-gray-500 mt-auto">
+        © 2025 ShopEasy by Krish
+      </footer>
+      
+    <script src="scripts.js"></script>
+    <script>
+      async function render_products() {
+        const products = await get_products();
+        const container = document.getElementById("product-list");
+
+        container.innerHTML = products.map(p => `
+            <div class="bg-white rounded-xl shadow hover:shadow-lg p-4 flex flex-col">
+                <img
+                    src="${p.image}"
+                    alt="${p.name}"
+                    class="aspect-[3/4] max-h-[16rem] object-contain rounded-md"
+                    />
+
+
+
+                <div class="mt-4 flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold">${p.brand} - ${p.name}</h3>
+                    <p class="text-sm text-gray-500">${p.category}</p>
+                    <div class="flex items-center mt-2 text-yellow-500">
+                    ${'★'.repeat(Math.floor(p.rating))}${'☆'.repeat(5 - Math.floor(p.rating))}
+                    <span class="ml-2 text-gray-600 text-sm">(${p.reviews})</span>
+                    </div>
+                    <ul class="text-sm text-gray-700 mt-2 list-disc list-inside">
+                    ${p.features.map(f => `<li>${f}</li>`).join("")}
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <p class="text-xl font-bold">₹${p.price}</p>
+                    <p class="text-sm ${p.in_stock ? 'text-green-600' : 'text-red-500'}">
+                    ${p.in_stock ? 'In Stock' : 'Out of Stock'}
+                    </p>
+                    <div class="flex gap-1 mt-2">
+                    ${p.color_options.map(c => `<span class="w-4 h-4 rounded-full border" style="background:${c.toLowerCase()}"></span>`).join("")}
+                    </div>
+                    ${
+                    p.in_stock
+                        ? `<button class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full" onclick="add_to_cart(${p.id})">
+                            Add to Cart
+                        </button>`
+                        : `<button disabled class="mt-3 bg-gray-400 text-white px-4 py-2 rounded w-full cursor-not-allowed">
+                            Out of Stock
+                        </button>`
+                    }
+                    <a href="product.html?id=${p.id}" class="block mt-2 text-center text-blue-600 hover:underline text-sm">View Details</a>
+                </div>
+                </div>
+            </div>
+            `).join('');
+
+        update_cart_count();
+      }
+
+      render_products();
+    </script>
+  </body>
+</html>
