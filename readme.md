@@ -36,5 +36,5 @@ A lightweight and responsive e-commerce frontend built using plain HTML, JavaScr
 - **Browser localStorage**  
 
 
-© 2025 Mini E-commerce by Krish  
+© 2025 ShopEasy by Krish  
 Made with code and coffee ☕  
